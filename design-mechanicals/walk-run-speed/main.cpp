@@ -1,0 +1,263 @@
+#include <SDL2/SDL.h>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#include "math.h"
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void Draw_Grid()
+{																	
+	for(float i = -500; i <= 500; i += 5)
+	{
+		glBegin(GL_LINES);
+			glColor3ub(150, 190, 150);							
+			glVertex3f(-500, 0, i);									
+			glVertex3f(500, 0, i);
+
+			glVertex3f(i, 0, -500);								
+			glVertex3f(i, 0, 500);
+		glEnd();
+	}
+}
+
+
+enum move_dir
+{   move_null = 0, 
+    move_up = 4, 
+    move_down = 8, 
+    move_left = 16,
+    move_right = 32
+};
+
+int current_move = move_null;
+vector<int> list_move;
+int check_moved(bool up,bool down,bool left,bool right)
+{
+    if(current_move == move_null)
+    {
+        if(up)
+        {
+            list_move.push_back(move_up);
+        }
+        if(down)
+        {
+            list_move.push_back(move_down);
+        }
+        if(left)
+        {
+            list_move.push_back(move_left);
+        }
+        if(right)
+        {
+            list_move.push_back(move_right);
+        }
+    }
+
+    if(!list_move.empty())
+    {
+        current_move = list_move[0];
+        if(up)
+        {
+            if(move_up == current_move)
+            {
+                return current_move;
+            }
+        }
+        if(down)
+        {
+            if(move_down == current_move)
+            {
+                return current_move;
+            }
+        }
+        if(left)
+        {
+            if(move_left == current_move)
+            {
+                return current_move;
+            }
+        }
+        if(right)
+        {
+            if(move_right == current_move)
+            {
+                return current_move;
+            }
+        }
+
+        list_move.clear();
+        current_move = move_null;
+        return check_moved(up,down,left,right);
+    }
+
+    return current_move;
+}
+
+vector<SDL_Keycode> temp_key;
+SDL_Keycode check_moved_key(SDL_Keycode key_name)
+{
+    if(key_name == SDLK_LEFT || key_name == SDLK_RIGHT || key_name == SDLK_UP || key_name == SDLK_DOWN)
+    {
+        temp_key.push_back(key_name);
+    }
+
+    return temp_key[0];
+}
+
+int main(int argv,char** argc)
+{
+    SDL_Init(SDL_INIT_EVERYTHING);
+
+	SDL_Window *window = SDL_CreateWindow("Story of Seasons ~ After Story ♪ [walk-run-speed]", 
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+        800, 600,
+		//SDL_WINDOW_RESIZABLE |
+		SDL_WINDOW_ALLOW_HIGHDPI |
+    	SDL_WINDOW_OPENGL);
+
+	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+	SDL_GL_MakeCurrent(window, gl_context);
+	SDL_GL_SetSwapInterval(SDL_TRUE);
+
+	glEnable(GL_DEPTH_TEST);
+
+    vec3 player_pos = vec3(0,0,0);
+
+        bool left = false;
+        bool right = false;
+        bool up = false;
+        bool down = false;
+        bool a_key = false;
+
+        bool moved = false;
+        vec3 dir = vec3(0,0,0);
+
+        vec3 temp_dir = vec3(0,0,0);
+
+    bool running = true;
+    while(running)
+    {
+/// event
+	    SDL_Event event;
+	    while (SDL_PollEvent(&event))
+	    {
+	    	if (event.type == SDL_QUIT)
+	    		running = false;
+	    	if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
+	    		running = false;
+
+            switch (event.type)
+            {
+                case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_a:  a_key = true; break;
+                    case SDLK_LEFT:  left = true; break;
+                    case SDLK_RIGHT: right = true; break;
+                    case SDLK_UP:    up = true; break;
+                    case SDLK_DOWN:  down = true; break;
+                }
+                break;
+                case SDL_KEYUP:
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_a:  a_key = false; break;
+                    case SDLK_LEFT: left = false; break;
+                    case SDLK_RIGHT: right = false; break;
+                    case SDLK_UP:    up = false; break;
+                    case SDLK_DOWN:  down = false; break;
+                }
+                break;
+            }
+
+	    }
+
+        if(!left && !right && !up && !down)
+        {
+            list_move.clear();
+            current_move = move_null;
+        }
+
+        int test_dir = check_moved(up,down,left,right); //feel like PSX (nostalgia)
+        cout << "test_dir: " << test_dir << endl;
+        cout << "current_move: " << current_move << endl;
+
+/// update
+    vec3 cam_pos(22.50,22.50,31.82);// spherical coordinates (45º,45º,45º)
+    vec3 cam_norm = normalize(cam_pos);
+    cam_norm = cam_norm*20.0f;
+
+    float speed_multipier = 1.0f;
+
+    if(a_key)
+    {
+        speed_multipier = speed_multipier * 2.0f;
+    }
+
+    float speed_walk = 0.25f;
+    
+    if(test_dir == move_up)
+    {
+        dir.z -= speed_walk;
+    }
+    if(test_dir == move_down)
+    {
+        dir.z += speed_walk;
+    }
+    if(test_dir == move_left)
+    {
+        dir.x -= speed_walk;
+    }
+    if(test_dir == move_right)
+    {
+        dir.x += speed_walk;
+    }
+
+    player_pos += dir*speed_multipier;
+
+    dir = vec3(0,0,0);
+
+/// draw
+	    glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+	    glClearDepth(1.0f);
+	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	    glViewport(0,0,800,600);
+
+	    glMatrixMode(GL_PROJECTION);
+	    glLoadIdentity();
+	    gluPerspective(45.0f,(GLfloat)800/(GLfloat)600,0.1f,1000.0f);
+	    glMatrixMode(GL_MODELVIEW);
+	    glLoadIdentity();			
+
+        gluLookAt(  player_pos.x+cam_norm.x,player_pos.y+cam_norm.y,player_pos.z+cam_norm.z,
+                    player_pos.x,player_pos.y,player_pos.z,
+                    0,1,0   );
+                
+        glPushMatrix();
+        {
+            GLUquadricObj *pObj = gluNewQuadric();
+            gluQuadricDrawStyle(pObj, GLU_FILL);
+
+            glTranslatef(player_pos.x,player_pos.y,player_pos.z);
+            glColor3f(1.0f,0.0f,1.0f);
+            gluSphere(pObj, 1.0f, 10, 8);
+        }
+        glPopMatrix();
+
+        glPushMatrix();
+        {
+            Draw_Grid();
+        }
+        glPopMatrix();
+
+        SDL_GL_SwapWindow(window);
+    }
+
+    return 0;
+}
