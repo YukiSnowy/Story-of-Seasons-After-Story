@@ -37,6 +37,13 @@ int current_move = move_null;
 vector<int> list_move;
 int check_moved(bool up,bool down,bool left,bool right)
 {
+/* //un-sure for optimize performance
+    if(!left && !right && !up && !down)
+    {
+        list_move.clear();
+        current_move = move_null;
+    }
+*/
     if(current_move == move_null)
     {
         if(up)
@@ -166,15 +173,9 @@ int main(int argv,char** argc)
 
 	    }
 
-        if(!left && !right && !up && !down)
-        {
-            list_move.clear();
-            current_move = move_null;
-        }
-
         int test_dir = check_moved(up,down,left,right); //feel like PSX (nostalgia)
-        cout << "test_dir: " << test_dir << endl;
-        cout << "current_move: " << current_move << endl;
+        //cout << "test_dir: " << test_dir << endl;
+        //cout << "current_move: " << current_move << endl;
 
 /// update
     vec3 cam_pos(22.50,22.50,31.82);// spherical coordinates (45º,45º,45º)
