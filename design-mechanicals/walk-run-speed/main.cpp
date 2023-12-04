@@ -97,17 +97,6 @@ int check_moved(bool up,bool down,bool left,bool right)
     return current_move;
 }
 
-vector<SDL_Keycode> temp_key;
-SDL_Keycode check_moved_key(SDL_Keycode key_name)
-{
-    if(key_name == SDLK_LEFT || key_name == SDLK_RIGHT || key_name == SDLK_UP || key_name == SDLK_DOWN)
-    {
-        temp_key.push_back(key_name);
-    }
-
-    return temp_key[0];
-}
-
 int main(int argv,char** argc)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
