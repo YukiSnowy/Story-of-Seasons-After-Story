@@ -37,13 +37,6 @@ int current_move = move_null;
 vector<int> list_move;
 int check_moved(bool up,bool down,bool left,bool right)
 {
-/* //un-sure for optimize performance
-    if(!left && !right && !up && !down)
-    {
-        list_move.clear();
-        current_move = move_null;
-    }
-*/
     if(current_move == move_null)
     {
         if(up)
@@ -63,6 +56,14 @@ int check_moved(bool up,bool down,bool left,bool right)
             list_move.push_back(move_right);
         }
     }
+
+//un-sure for optimize performance
+    if(!left && !right && !up && !down)
+    {
+        list_move.clear();
+        current_move = move_null;
+    }
+
 
     if(!list_move.empty())
     {
