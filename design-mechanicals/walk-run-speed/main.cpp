@@ -131,11 +131,8 @@ int main(int argv,char** argc)
         bool down = false;
         bool a_key = false;
 
-        bool moved = false;
         vec3 dir = vec3(0,0,0);
-
-        vec3 temp_dir = vec3(0,0,0);
-
+        
     bool running = true;
     while(running)
     {
