@@ -34,40 +34,49 @@ enum move_dir
 };
 
 int current_move = move_null;
-vector<int> list_move;
+//vector<int> list_move;
 int check_moved(bool up,bool down,bool left,bool right)
 {
     if(current_move == move_null)
     {
         if(up)
         {
-            list_move.push_back(move_up);
+            //list_move.push_back(move_up);
+            current_move = move_up;
+            return current_move;
         }
         if(down)
         {
-            list_move.push_back(move_down);
+            //list_move.push_back(move_down);
+            current_move = move_down;
+            return current_move;
         }
         if(left)
         {
-            list_move.push_back(move_left);
+            //list_move.push_back(move_left);
+            current_move = move_left;
+            return current_move;
         }
         if(right)
         {
-            list_move.push_back(move_right);
+            //list_move.push_back(move_right);
+            current_move = move_right;
+            return current_move;
         }
     }
 
 //un-sure for optimize performance
     if(!left && !right && !up && !down)
     {
-        list_move.clear();
+        //list_move.clear();
         current_move = move_null;
     }
 
 
-    if(!list_move.empty())
+    //if(!list_move.empty())
+    if(current_move != move_null)
     {
-        current_move = list_move[0];
+        //current_move = list_move[0];
         if(up)
         {
             if(move_up == current_move)
@@ -97,7 +106,7 @@ int check_moved(bool up,bool down,bool left,bool right)
             }
         }
 
-        list_move.clear();
+        //list_move.clear();
         current_move = move_null;
         return check_moved(up,down,left,right);
     }
