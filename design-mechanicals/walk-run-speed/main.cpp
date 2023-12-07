@@ -78,28 +78,28 @@ int check_moved(bool up,bool down,bool left,bool right)
         //current_move = list_move[0];
         if(up)
         {
-            if(move_up == current_move)
+            if(current_move == move_up)
             {
                 return current_move;
             }
         }
         if(down)
         {
-            if(move_down == current_move)
+            if(current_move == move_down)
             {
                 return current_move;
             }
         }
         if(left)
         {
-            if(move_left == current_move)
+            if(current_move == move_left)
             {
                 return current_move;
             }
         }
         if(right)
         {
-            if(move_right == current_move)
+            if(current_move == move_right)
             {
                 return current_move;
             }
