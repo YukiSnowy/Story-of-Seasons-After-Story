@@ -34,7 +34,6 @@ enum move_dir
 };
 
 int current_move = move_null;
-//vector<int> list_move;
 int check_moved(bool up,bool down,bool left,bool right)
 {
     if(current_move == move_null)
@@ -114,6 +113,78 @@ int check_moved(bool up,bool down,bool left,bool right)
     return current_move;
 }
 
+vector<int> list_move;
+int check_moved_2(bool up,bool down,bool left,bool right)
+{
+    if(current_move == move_null)
+    {
+        if(up)
+        {
+            list_move.push_back(move_up);
+        }
+        if(down)
+        {
+            list_move.push_back(move_down);
+        }
+        if(left)
+        {
+            list_move.push_back(move_left);
+        }
+        if(right)
+        {
+            list_move.push_back(move_right);
+        }
+    }
+
+//un-sure for optimize performance
+    if(!left && !right && !up && !down)
+    {
+        list_move.clear();
+        current_move = move_null;
+    }
+
+    if(!list_move.empty())
+    {
+        current_move = list_move[0];
+        if(up)
+        {
+            if(move_up == current_move)
+            {
+                return current_move;
+            }
+        }
+        if(down)
+        {
+            if(move_down == current_move)
+            {
+                return current_move;
+            }
+        }
+        if(left)
+        {
+            if(move_left == current_move)
+            {
+                return current_move;
+            }
+        }
+        if(right)
+        {
+            if(move_right == current_move)
+            {
+                return current_move;
+            }
+        }
+
+        list_move.clear();
+        current_move = move_null;
+        return check_moved_2(up,down,left,right);
+    }
+
+    return current_move;
+}
+
+
+
 int main(int argv,char** argc)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -180,7 +251,8 @@ int main(int argv,char** argc)
 
 	    }
 
-        int test_dir = check_moved(up,down,left,right); //feel like PSX (nostalgia)
+        int test_dir = check_moved_2(up,down,left,right); //old design
+        //int test_dir = check_moved(up,down,left,right); //feel like PSX (nostalgia)
         //cout << "test_dir: " << test_dir << endl;
         //cout << "current_move: " << current_move << endl;
 
