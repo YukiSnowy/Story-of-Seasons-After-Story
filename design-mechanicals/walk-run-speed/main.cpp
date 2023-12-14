@@ -184,6 +184,78 @@ int check_moved_2(bool up,bool down,bool left,bool right)
 }
 
 
+// i get this idea from COS4102 (Cohen–Sutherland algorithm) bring bits only
+typedef int Encode;
+Encode encode_current;
+
+const int NONE = 0;     // 0000
+const int LEFT = 1;     // 0001
+const int RIGHT = 2;    // 0010
+const int DOWN = 4;     // 0100
+const int UP = 8;       // 1000
+
+Encode ComputeEncode(bool up,bool down,bool left,bool right)
+{
+	Encode code = NONE;
+
+    if(up)
+    {
+        code |= UP;
+    }
+    if(down)
+    {
+        code |= DOWN;
+    }
+    if(left)
+    {
+        code |= LEFT;
+    }
+    if(right)
+    {
+        code |= RIGHT;
+    }
+
+	return code;
+}
+
+#include <bitset>
+
+int check_moved_3(Encode encode)
+{
+    //Encode encode = ComputeEncode(up,down,left,right);
+
+    if(encode)
+    {
+        if(!encode_current)
+        {
+            encode_current = encode;
+        }
+        else
+        {
+            if ((encode & encode_current) & UP)
+            {
+                return move_up;
+            }
+            if ((encode & encode_current) & DOWN)
+            {
+                return move_down;
+            }
+            if ((encode & encode_current) & LEFT)
+            {
+                return move_left;
+            }
+            if ((encode & encode_current) & RIGHT)
+            {
+                return move_right;
+            }
+
+            encode_current = NONE;
+            return check_moved_3(encode);
+        }
+    }
+
+    return move_null;
+}
 
 int main(int argv,char** argc)
 {
@@ -251,7 +323,10 @@ int main(int argv,char** argc)
 
 	    }
 
-        int test_dir = check_moved_2(up,down,left,right); //old design
+        Encode encode = ComputeEncode(up,down,left,right);
+        int test_dir = check_moved_3(encode); //new design
+
+        //int test_dir = check_moved_2(up,down,left,right); //old design
         //int test_dir = check_moved(up,down,left,right); //feel like PSX (nostalgia)
         //cout << "test_dir: " << test_dir << endl;
         //cout << "current_move: " << current_move << endl;
