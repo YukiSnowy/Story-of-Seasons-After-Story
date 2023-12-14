@@ -187,12 +187,21 @@ int check_moved_2(bool up,bool down,bool left,bool right)
 // i get this idea from COS4102 (Cohen–Sutherland algorithm) bring bits only
 typedef int Encode;
 Encode encode_current;
-
+/*
 const int NONE = 0;     // 0000
 const int LEFT = 1;     // 0001
 const int RIGHT = 2;    // 0010
 const int DOWN = 4;     // 0100
 const int UP = 8;       // 1000
+*/
+
+enum encode_dir
+{   NONE = 0, 
+    LEFT = 1, 
+    RIGHT = 2, 
+    DOWN = 4,
+    UP = 8
+};
 
 Encode ComputeEncode(bool up,bool down,bool left,bool right)
 {
@@ -234,19 +243,19 @@ int check_moved_3(Encode encode)
             
             if (encode_last & UP)
             {
-                return move_up;
+                return UP;
             }
             if (encode_last & DOWN)
             {
-                return move_down;
+                return DOWN;
             }
             if (encode_last & LEFT)
             {
-                return move_left;
+                return LEFT;
             }
             if (encode_last & RIGHT)
             {
-                return move_right;
+                return RIGHT;
             }
 
             encode_current = NONE;
@@ -254,7 +263,7 @@ int check_moved_3(Encode encode)
         }
     }
 
-    return move_null;
+    return NONE;
 }
 
 int main(int argv,char** argc)
@@ -344,7 +353,7 @@ int main(int argv,char** argc)
     }
 
     float speed_walk = 0.25f;
-    
+/*  
     if(test_dir == move_up)
     {
         dir.z -= speed_walk;
@@ -361,7 +370,25 @@ int main(int argv,char** argc)
     {
         dir.x += speed_walk;
     }
+*/
 
+    if(test_dir == UP)
+    {
+        dir.z -= speed_walk;
+    }
+    if(test_dir == DOWN)
+    {
+        dir.z += speed_walk;
+    }
+    if(test_dir == LEFT)
+    {
+        dir.x -= speed_walk;
+    }
+    if(test_dir == RIGHT)
+    {
+        dir.x += speed_walk;
+    }
+    
     player_pos += dir*speed_multipier;
 
     dir = vec3(0,0,0);
