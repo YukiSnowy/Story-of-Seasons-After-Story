@@ -222,8 +222,6 @@ Encode ComputeEncode(bool up,bool down,bool left,bool right)
 
 int check_moved_3(Encode encode)
 {
-    //Encode encode = ComputeEncode(up,down,left,right);
-
     if(encode)
     {
         if(!encode_current)
@@ -232,19 +230,21 @@ int check_moved_3(Encode encode)
         }
         else
         {
-            if ((encode & encode_current) & UP)
+            Encode encode_last = encode & encode_current;
+            
+            if (encode_last & UP)
             {
                 return move_up;
             }
-            if ((encode & encode_current) & DOWN)
+            if (encode_last & DOWN)
             {
                 return move_down;
             }
-            if ((encode & encode_current) & LEFT)
+            if (encode_last & LEFT)
             {
                 return move_left;
             }
-            if ((encode & encode_current) & RIGHT)
+            if (encode_last & RIGHT)
             {
                 return move_right;
             }
