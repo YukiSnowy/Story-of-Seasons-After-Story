@@ -13,6 +13,11 @@
 #include <vector>
 using namespace std;
 
+#define FPS 50.0f //PAL
+//#define FPS 60.0f //NTSC
+//#define FPS 120.0f //PC-CUSTOM
+#define FPS_UPDATE 60.0f
+
 void Draw_Grid()
 {																	
 	for(float i = -500; i <= 500; i += 5)
@@ -270,6 +275,13 @@ int check_moved_3(Encode encode)
     return NONE;
 }
 
+static uint64_t get_time_ns(void)
+{
+   struct timespec ts;
+   clock_gettime(CLOCK_MONOTONIC, &ts);
+   return (uint64_t)ts.tv_sec * (uint64_t)1e9 + (uint64_t)ts.tv_nsec;
+}
+
 int main(int argv,char** argc)
 {
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
@@ -302,11 +314,27 @@ printf("%s",glGetString(GL_RENDERER));
 
         vec3 dir = vec3(0,0,0);
     
+
+double time         = 0.0;
+		double accumulator  = 0.0;
+        const constexpr double dt = 1000.0 / FPS_UPDATE;
+
+auto current_time = get_time_ns()*0.001*0.001;
+
     bool running = true;
     while(running)
     {
 
 vec3 cam_norm;
+
+auto new_time     = get_time_ns()*0.001*0.001;
+double frame_time   = new_time - current_time;
+current_time = new_time;
+
+accumulator += frame_time;
+
+while (accumulator >= dt)
+    {
 
 /// event
 	    SDL_Event event;
@@ -382,6 +410,11 @@ vec3 cam_norm;
 
     dir = vec3(0,0,0);
 
+        accumulator -= dt;
+        time += dt;
+
+    }
+
 /// draw
 	    glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
 	    glClearDepth(1.0f);
@@ -417,6 +450,19 @@ vec3 cam_norm;
         glPopMatrix();
 
         SDL_GL_SwapWindow(window);
+
+   if (FPS > 0)
+   {
+      static uint64_t last_time;
+      const double interval = 1e9 / FPS;
+      const useconds_t step = interval / 1e6;
+      while (last_time > 0 && get_time_ns() - last_time < interval)
+      {
+         sched_yield();
+         usleep(step);
+      }
+      last_time = get_time_ns();
+   }
     }
 
     return 0;
