@@ -275,6 +275,7 @@ int check_moved_3(Encode encode)
     return NONE;
 }
 
+// from https://gist.github.com/therathatter/1bc149bc292f48a0c5511df84de2f3dc {Pump It Up 60 FPS locker}
 static uint64_t get_time_ns(void)
 {
    struct timespec ts;
@@ -451,6 +452,7 @@ while (accumulator >= dt)
 
         SDL_GL_SwapWindow(window);
 
+// from https://gist.github.com/therathatter/1bc149bc292f48a0c5511df84de2f3dc {Pump It Up 60 FPS locker}
    if (FPS > 0)
    {
       static uint64_t last_time;
