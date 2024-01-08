@@ -328,6 +328,7 @@ auto current_time = get_time_ns()*0.001*0.001;
 
 vec3 cam_norm;
 
+//from https://gafferongames.com/post/fix_your_timestep/ {Fix Your Timestep!}
 auto new_time     = get_time_ns()*0.001*0.001;
 double frame_time   = new_time - current_time;
 current_time = new_time;
