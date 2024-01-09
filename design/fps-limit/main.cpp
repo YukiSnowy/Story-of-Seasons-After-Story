@@ -315,8 +315,8 @@ int setpriority(int which, int who, int value)
   }
   return 0;
 }
-
 #endif
+
 int main(int argv,char** argc)
 {
     setpriority(PRIO_PROCESS, 0, 0);
