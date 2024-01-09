@@ -283,8 +283,44 @@ static uint64_t get_time_ns(void)
    return (uint64_t)ts.tv_sec * (uint64_t)1e9 + (uint64_t)ts.tv_nsec;
 }
 
+// from https://github.com/facebook/folly/blob/c83bd7eb9851256657e58585c6906d0589fb58c4/folly/portability/SysResource.cpp#L80
+// setpriority for windows
+#ifdef _WIN32
+// https://github.com/RT-Thread/rt-thread/blob/db5bdb1ffadced28e40b97cd62e95f87ee248db9/components/lwp/lwp_syscall.h#L44
+#define	PRIO_PROCESS 0
+int setpriority(int which, int who, int value)
+{
+  if (which != PRIO_PROCESS || who != 0) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  auto newClass = [value] {
+    if (value >= 39) {
+      return IDLE_PRIORITY_CLASS;
+    } else if (value >= 30) {
+      return BELOW_NORMAL_PRIORITY_CLASS;
+    } else if (value >= 20) {
+      return NORMAL_PRIORITY_CLASS;
+    } else if (value >= 10) {
+      return ABOVE_NORMAL_PRIORITY_CLASS;
+    } else {
+      return HIGH_PRIORITY_CLASS;
+    }
+  }();
+
+  if (!SetPriorityClass(GetCurrentProcess(), newClass)) {
+    errno = EACCES;
+    return -1;
+  }
+  return 0;
+}
+
+#endif
 int main(int argv,char** argc)
 {
+    setpriority(PRIO_PROCESS, 0, 0);
+
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
     SDL_Init(SDL_INIT_EVERYTHING);
