@@ -13,8 +13,8 @@
 #include <vector>
 using namespace std;
 
-#define FPS 50.0f //PAL
-//#define FPS 60.0f //NTSC
+//#define FPS 50.0f //PAL
+#define FPS 60.0f //NTSC
 //#define FPS 120.0f //PC-CUSTOM
 #define FPS_UPDATE 60.0f
 
@@ -459,6 +459,10 @@ while (accumulator >= dt)
       static uint64_t last_time;
       const double interval = 1e9 / FPS;
       const useconds_t step = interval / 1e6;
+// from https://www.geeksforgeeks.org/petersons-algorithm-for-mutual-exclusion-set-2-cpu-cycles-and-memory-fence/ {Peterson’s Algorithm for Mutual Exclusion | Set 2 (CPU Cycles and Memory Fence)}
+    // Memory fence to prevent the reordering
+    // of instructions beyond this barrier.
+    __sync_synchronize();
       while (last_time > 0 && get_time_ns() - last_time < interval)
       {
          sched_yield();
