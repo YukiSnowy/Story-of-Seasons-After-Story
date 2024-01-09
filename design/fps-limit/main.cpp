@@ -495,12 +495,14 @@ while (accumulator >= dt)
       static uint64_t last_time;
       const double interval = 1e9 / FPS;
       const useconds_t step = interval / 1e6;
+      while (last_time > 0 && get_time_ns() - last_time < interval)
+      {
+        
 // from https://www.geeksforgeeks.org/petersons-algorithm-for-mutual-exclusion-set-2-cpu-cycles-and-memory-fence/ {Peterson’s Algorithm for Mutual Exclusion | Set 2 (CPU Cycles and Memory Fence)}
     // Memory fence to prevent the reordering
     // of instructions beyond this barrier.
     __sync_synchronize();
-      while (last_time > 0 && get_time_ns() - last_time < interval)
-      {
+
          sched_yield();
          usleep(step);
       }
